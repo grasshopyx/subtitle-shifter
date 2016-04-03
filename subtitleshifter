@@ -1,0 +1,58 @@
+#!/usr/local/bin/python3
+import re
+import datetime
+import argparse
+
+def llog(string):
+    """TODO: Docstring for llog.
+
+    :arg1: TODO
+    :returns: TODO
+
+    """
+    # print(string)
+
+parser = argparse.ArgumentParser()
+parser.add_argument("infile", help="give the input file name")
+parser.add_argument("deltatime", help="define the deltatime in seconds", type=int)
+parser.add_argument("-o", "--outfile", help="give the output file  name")
+args = parser.parse_args()
+
+fo = open(args.infile, "r")
+
+lines = fo.readlines()
+
+time_pattern = re.compile(r'(\d\d):(\d\d):(\d\d)')
+
+fo.close()
+
+# callable
+def repl(m):
+    """TODO: Docstring for repl.
+
+    :m: TODO
+    :returns: TODO
+
+    """
+    hour = m.group(1)
+    minute = m.group(2)
+    second = m.group(3)
+    hour = int(hour)
+    minute = int(minute)
+    second = int(second)
+    subtitle_datetime = datetime.datetime(100,1,1,hour,minute,second) # weird
+    replaced_datetime = subtitle_datetime + datetime.timedelta(seconds=args.deltatime)
+    return str(replaced_datetime.time())
+
+
+if args.outfile is None:
+    f_out = open("out.srt", "w")
+else :
+    f_out = open(args.outfile,"w")
+
+for line in lines:
+
+    new_line = re.sub(time_pattern, repl, line)
+    f_out.write(new_line)
+
+f_out.close()
